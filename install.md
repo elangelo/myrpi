@@ -103,3 +103,51 @@ ExecStop=/usr/bin/docker compose down
 WantedBy=multi-user.target
 EOL
 ```
+# PM2
+* install pm2 globally
+```bash
+sudo npm install -g pm2
+```
+* as samuel (this gives you the right command to start as systemd user)
+```bash
+pm2 startup
+```
+
+# PiTemp
+* On your own computer
+```bash
+sudo apt install dotnet-sdk-6.0
+git clone git@github.com:elangelo/PiTherm.git
+cd PiTherm
+bash build.sh
+rsync -a bin/Debug/net6.0/linux-arm64 samuel@192.168.0.200:PiTempCollector
+```
+* on RPI
+```bash
+cat "dtoverlay=w1-gpio" >> /boot/config.txt
+reboot
+```
+* start PiTempCollector
+```bash
+pm2 start /home/samuel/PiTempCollector/linux-arm64/piTempCollector --watch --name PiTempCollector
+```
+
+# gate
+* enable gpio17
+```bash
+#!/bin/bash
+
+if [[ ! -d /sys/class/gpio/gpio17 ]]
+then
+    echo "17" > /sys/class/gpio/export
+    echo "out" > /sys/class/gpio/gpio17/direction
+else
+    echo "gpio17 is already enabled"
+fi
+```
+* `cp gate ~/gate`
+
+* add to pm2
+```bash
+pm2 start /home/samuel/gate/index.js --watch --name gate
+```
