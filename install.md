@@ -133,6 +133,8 @@ pm2 start /home/samuel/PiTempCollector/linux-arm64/piTempCollector --watch --nam
 ```
 
 # gate
+optocoupler
+
 * enable gpio17
 ```bash
 #!/bin/bash
